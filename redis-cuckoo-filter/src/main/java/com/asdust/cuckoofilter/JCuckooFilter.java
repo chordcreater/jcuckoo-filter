@@ -7,7 +7,10 @@ package com.asdust.cuckoofilter;
  */
 public class JCuckooFilter {
 
-
+    /**
+     * @param 
+     * @return 
+    */
     public void add(){
 
     }
