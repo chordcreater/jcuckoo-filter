@@ -5,21 +5,45 @@ package com.asdust.cuckoofilter;
  * @date: 2022/7/31 17:35
  * @desc:
  */
-public class JCuckooFilter {
+public class JCuckooFilter<T> {
+    private FilterTable table;
 
-
-    public void add(){
-
+    public JCuckooFilter(){
+        table = new FilterTable();
     }
 
-    public void contain(){
+    /**
+     * TODO methods
+     * @param item
+     * @return true or false
+     */
+    public boolean put(T item){
 
+        return true;
     }
-    public void delete(){
-
+    /**
+     * TODO methods
+     * @return true or false
+     */
+    public boolean contain(){
+        return true;
+    }
+    /** 
+     * TODO methods
+     * @param item
+     * @return true or false
+     */
+    public boolean delete(T item){
+        return true;
     }
 
-    public void size(){
 
+    /**
+     * TODO methods
+     * @return @return number of items in filter
+     */
+    public long size() {
+        // can return more than maxKeys if running above design limit!
+        return 0L;
     }
 }
