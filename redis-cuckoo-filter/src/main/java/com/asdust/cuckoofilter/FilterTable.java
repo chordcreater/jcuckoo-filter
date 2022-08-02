@@ -6,4 +6,10 @@ package com.asdust.cuckoofilter;
  * desc：
  **/
 public class FilterTable {
+    // 最大容量
+    private long numBuckets;
+    // 指纹字节数
+    public FilterTable(long numBuckets){
+        this.numBuckets = numBuckets;
+    }
 }
