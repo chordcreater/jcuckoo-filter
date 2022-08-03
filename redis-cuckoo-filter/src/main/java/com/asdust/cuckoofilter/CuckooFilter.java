@@ -17,6 +17,9 @@ public class CuckooFilter<T> {
      * 负载因子,超过后，则以2倍扩容
      */
     private static final double LOAD_FACTOR = 0.955;
+
+
+    private static final int MAX_TRY_CUCKOO_COUNT = 500;
     /**
      * TODO methods
      * @param max_num_keys 期望存放的最大key个数
@@ -34,13 +37,11 @@ public class CuckooFilter<T> {
      * @return true or false
      */
     public boolean put(T item){
-        // 计算出索引和指纹
+        // 计算出索引和指纹以及另一个索引
 
-        // 循环写入table，若写入成功则退出，写入失败，则弹出占位值，作为新值插入，如此循环知道插入成功，或者达到最大值
+        // 循环写入table，若写入成功则退出，写入失败，则弹出占位值，作为新值插入，如此循环直到插入成功，或者达到最大值500
 
-        // 若不存在，则写入
-
-        // 若存在，则。。
+        //若到达最大尝试次数，则使用victim(牺牲者)将被剔除这缓存起来，任然返回true
 
         return true;
     }
@@ -63,7 +64,9 @@ public class CuckooFilter<T> {
     public boolean delete(T item){
         // 计算出两个索引的位置
 
+        // 存在则删除
 
+        //否则检查是否为victim，若是则设置victim为false
 
         return true;
     }
