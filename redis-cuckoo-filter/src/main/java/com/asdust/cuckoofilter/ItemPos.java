@@ -8,7 +8,6 @@ package com.asdust.cuckoofilter;
 public class ItemPos {
     private long curIndex;
 
-    private long altIndex;
     private long tag;
 
     public long getCurIndex() {
@@ -27,11 +26,4 @@ public class ItemPos {
         this.tag = tag;
     }
 
-    public long getAltIndex() {
-        return altIndex;
-    }
-
-    public void setAltIndex(long altIndex) {
-        this.altIndex = altIndex;
-    }
 }
