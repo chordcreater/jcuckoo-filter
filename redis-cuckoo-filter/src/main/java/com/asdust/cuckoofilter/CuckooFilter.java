@@ -6,6 +6,7 @@ import com.google.common.math.DoubleMath;
 
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -74,31 +75,35 @@ public class CuckooFilter<T> {
      * @return true or false
      */
     public boolean put(T item) {
-        long curIndex, tag, oldTag;
+        long curIndex, altIndex, tag;
         // 计算出索引和指纹以及另一个索引
         ItemPos itemPos = generateIndexTagHash(item);
         curIndex = itemPos.getCurIndex();
         tag = itemPos.getTag();
-        oldTag = table.insert(curIndex, tag);
-        if (oldTag == 0) {
+        altIndex = table.altHashIndex(curIndex, tag);
+        if (table.insert(curIndex, tag) || table.insert(altIndex, tag)) {
             numItems.incrementAndGet();
             return true;
         }
-        // 循环写入table，若写入成功则退出，写入失败，则弹出占位值，作为新值插入，如此循环直到插入成功，或者达到最大值500
+        //全部已满，则从槽1或槽2中随机剔除一个值的位置插入，然后将新的值插入到新的槽中，如此循环直到插入成功，或者达到最大值500
         for (int count = 1; count < MAX_TRY_CUCKOO_COUNT; count++) {
-            curIndex = table.altHashIndex(curIndex, tag);
-            oldTag = table.insert(curIndex, tag);
-            if (oldTag == 0) {
-                numItems.incrementAndGet();
+            // 随机获取一个槽的tag
+            long index = randSelectSlot(curIndex, altIndex);
+            long oldTag = table.randSelectTag(index, tag);
+            if (table.insert(curIndex, oldTag)) {
                 return true;
-
             }
-            //全部已满，则挑选一个值oldtag,再插入
-            tag = oldTag;
+            curIndex = index;
+            altIndex = table.altHashIndex(curIndex, oldTag);
         }
         //todo 若到达最大尝试次数，则使用victim(牺牲者)将被剔除这缓存起来，任然返回true
         numItems.incrementAndGet();
         return true;
+    }
+
+    private long randSelectSlot(long curIndex, long altIndex) {
+        int randNum = ThreadLocalRandom.current().nextInt(2);
+        return randNum == 0 ? curIndex : altIndex;
     }
 
     /**
@@ -136,7 +141,7 @@ public class CuckooFilter<T> {
         tag = itemPos.getTag();
         altIndex = table.altHashIndex(curIndex, tag);
         // 存在则删除
-        if (table.delete(curIndex, tag) || table.delete(altIndex, tag)){
+        if (table.delete(curIndex, tag) || table.delete(altIndex, tag)) {
             numItems.decrementAndGet();
             return true;
         }

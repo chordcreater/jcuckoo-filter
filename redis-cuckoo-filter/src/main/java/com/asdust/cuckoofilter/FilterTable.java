@@ -35,7 +35,7 @@ public class FilterTable {
 
     private static RedisUtils redisUtils;
 
-    private  CommandAsyncExecutor commandExecutor;
+    private CommandAsyncExecutor commandExecutor;
 
     public FilterTable(long estimatedMaxNumKeys, RedisConfig redisConfig) {
         // 计算出实际的桶的个数
@@ -49,7 +49,7 @@ public class FilterTable {
 //        bloomFilter.tryInit(200, 0.01);
     }
 
-    private void tryInit(long numBuckets){
+    private void tryInit(long numBuckets) {
 //        this.size = this.optimalNumOfBits(numBuckets);
 //        CommandBatchService executorService = new CommandBatchService(this.commandExecutor);
 //        executorService.evalReadAsync(this.configName, this.codec, RedisCommands.EVAL_VOID, "local size = redis.call('hget', KEYS[1], 'size');local hashIterations = redis.call('hget', KEYS[1], 'hashIterations');assert(size == false and hashIterations == false, 'Bloom filter config has been changed')", Arrays.asList(this.configName), new Object[]{this.size, this.hashIterations});
@@ -107,20 +107,30 @@ public class FilterTable {
         return (hashVal << unusedBits) >>> unusedBits;
     }
 
-    private long[] hash(long tag){
+    private long[] hash(long tag) {
         return null;
     }
 
-    public long insert(long curIndex, long tag) {
+    public Boolean insert(long curIndex, long tag) {
+        //
         long startPos = curIndex * BUCKET_SIZE;
         long endPos = curIndex * BUCKET_SIZE;
         long[] indexes = hash(tag);
         CommandBatchService executorService = new CommandBatchService(commandExecutor);
         RBitSetAsync bs = redisUtils.createBitSet(executorService);
+        // 遍历槽位的 4 个元素，如果为空则插入
         for (int i = 0; i < indexes.length; i++) {
             // 将位下标对应位设置1
             bs.setAsync(indexes[i]);
         }
+
+        return true;
+    }
+
+    public long randSelectTag(long index, long tag){
+        // 随机从槽位中选取一个元素
+
+        // 插入新值
 
         return 0L;
     }
