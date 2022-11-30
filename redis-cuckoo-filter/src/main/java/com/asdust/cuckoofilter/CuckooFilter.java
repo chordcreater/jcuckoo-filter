@@ -1,5 +1,7 @@
 package com.asdust.cuckoofilter;
 
+import com.asdust.cuckoofilter.core.FilterTable;
+import com.asdust.cuckoofilter.core.ItemPos;
 import com.asdust.cuckoofilter.redis.RedisConfig;
 import com.asdust.cuckoofilter.utils.HashUtils;
 import com.google.common.math.DoubleMath;
@@ -22,8 +24,6 @@ public class CuckooFilter<T> {
     private final AtomicLong numItems = new AtomicLong(0);
 
     /**
-     * TODO methods
-     *
      * @param estimatedMaxNumKeys 期望存放的最大key个数
      */
     public CuckooFilter(Long estimatedMaxNumKeys, RedisConfig redisConfig) {
@@ -96,7 +96,7 @@ public class CuckooFilter<T> {
             curIndex = index;
             altIndex = table.altHashIndex(curIndex, oldTag);
         }
-        //todo 若到达最大尝试次数，则使用victim(牺牲者)将被剔除这缓存起来，任然返回true
+        //todo 若到达最大尝试次数，则使用victim(牺牲者)将被剔除这缓存起来，仍然返回true
         numItems.incrementAndGet();
         return true;
     }

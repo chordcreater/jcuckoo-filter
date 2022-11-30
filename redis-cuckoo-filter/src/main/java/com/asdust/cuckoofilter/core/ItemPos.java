@@ -1,4 +1,4 @@
-package com.asdust.cuckoofilter;
+package com.asdust.cuckoofilter.core;
 
 /**
  * @author: Jianxing.Huang
