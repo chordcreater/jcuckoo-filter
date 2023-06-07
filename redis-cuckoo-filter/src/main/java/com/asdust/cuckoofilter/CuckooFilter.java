@@ -127,7 +127,7 @@ public class CuckooFilter<T> {
     }
 
     /**
-     * TODO methods
+     * 删除指定元素
      *
      * @param item
      * @return true or false
@@ -151,7 +151,7 @@ public class CuckooFilter<T> {
 
 
     /**
-     * TODO methods
+     * 获取存放的元素数量
      *
      * @return @return number of items in filter
      */

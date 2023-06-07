@@ -6,8 +6,14 @@ package com.asdust.cuckoofilter.core;
  * @desc:
  */
 public class ItemPos {
+    /**
+     * 位置下标
+     */
     private long curIndex;
 
+    /**
+     * 指纹
+     */
     private long tag;
 
     public long getCurIndex() {

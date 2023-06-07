@@ -22,9 +22,6 @@ public class FilterTable {
      * 最大容量
      */
     private long numBuckets;
-
-
-
     /**
      * 每个桶的大小为4，即可以存放4个key
      */
@@ -33,8 +30,6 @@ public class FilterTable {
      * 负载因子,超过后，则以2倍扩容
      */
     private static final double LOAD_FACTOR = 0.955;
-
-
     /**
      * 指纹位数,最后通过计算公式得出最佳数量，即每个桶的大小，位数越高，精确度越高
      */
@@ -47,7 +42,6 @@ public class FilterTable {
     public FilterTable(long estimatedMaxNumKeys, RedisConfig redisConfig) {
         // 计算出实际的桶的个数
         this.numBuckets = getBucketsNeeded(estimatedMaxNumKeys, LOAD_FACTOR, BUCKET_SIZE);
-
         // 计算出需要申请的bitmap大小
         Long bitMapSize = this.numBuckets * BUCKET_SIZE;
         // 初始化redis
@@ -83,8 +77,9 @@ public class FilterTable {
     }
 
     public long hashIndex(long hash) {
-        // 左移tag位，只用移动后的数来获取槽索引，可以是相近的hash值key在table中更加分散
+        // 左移tag位，只用移动后的数来获取槽索引，可以使相近的hash值key在table中更加分散
         long hashValue = hash >>> BITS_PER_TAG;
+        // hash值与桶的个数减1逻辑与运算，计算出元素的索引：该计算与hashMap一样需要满足桶的个数需要为2的整数次幂方
         return hashValue & (numBuckets - 1);
     }
 
