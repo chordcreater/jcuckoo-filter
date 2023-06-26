@@ -26,9 +26,12 @@ import static org.junit.Assert.assertTrue;
 
 public class TestCuckooFilter {
 
-	@Test(expected = IllegalArgumentException.class)
+//	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testInvalidArgsTooHighFp() {
 		RedisConfig redisConfig = new RedisConfig();
+		redisConfig.setAddress("redis://127.0.0.1:6379");
+		redisConfig.setRedisBitKey("cuckoo:key:test");
 		CuckooFilter<String>  cuckooFilter = new CuckooFilter<String> (2000000L, redisConfig);
 		cuckooFilter.put("aaaa");
 		assertTrue(cuckooFilter.contain("aaaa"));

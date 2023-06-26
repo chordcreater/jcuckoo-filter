@@ -81,8 +81,10 @@ public class CuckooFilter<T> {
         curIndex = itemPos.getCurIndex();
         tag = itemPos.getTag();
         altIndex = table.altHashIndex(curIndex, tag);
+        System.out.println("put:curIndex:"+curIndex+",altIndex:"+altIndex+",:tag:"+tag);
         if (table.insert(curIndex, tag) || table.insert(altIndex, tag)) {
             numItems.incrementAndGet();
+            System.out.println("incrementAndGet");
             return true;
         }
         //全部已满，则从槽1或槽2中随机剔除一个值的位置插入，然后将新的值插入到新的槽中，如此循环直到插入成功，或者达到最大值500
@@ -120,10 +122,8 @@ public class CuckooFilter<T> {
         tag = itemPos.getTag();
         altIndex = table.altHashIndex(curIndex, tag);
         // 查询是否存在table中
-        if (table.contain(curIndex, altIndex, tag)) {
-            return true;
-        }
-        return false;
+        System.out.println("contain:curIndex:"+curIndex+",altIndex:"+altIndex+",:tag:"+tag);
+        return table.contain(curIndex, altIndex, tag);
     }
 
     /**

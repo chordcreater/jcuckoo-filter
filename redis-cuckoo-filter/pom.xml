@@ -15,6 +15,7 @@
 <!--        <source.version>1.0.0</source.version>-->
 <!--        <release.version>1.0.0</release.version>-->
         <javadoc.version>1.0.0</javadoc.version>
+        <alibaba.fastjson.version>1.2.71</alibaba.fastjson.version>
     </properties>
 
     <dependencies>
@@ -48,6 +49,11 @@
             <artifactId>junit</artifactId>
             <version>4.8</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${alibaba.fastjson.version}</version>
         </dependency>
     </dependencies>
     <build>

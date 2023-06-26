@@ -1,5 +1,6 @@
 package com.asdust.cuckoofilter.core;
 
+import com.alibaba.fastjson.JSON;
 import com.asdust.cuckoofilter.redis.RedisConfig;
 import com.asdust.cuckoofilter.redis.RedisUtils;
 import com.google.common.math.DoubleMath;
@@ -46,8 +47,8 @@ public class FilterTable {
         Long bitMapSize = this.numBuckets * BUCKET_SIZE;
         // 初始化redis
         Config config = new Config();
-        config.useSingleServer().setAddress("redis://127.0.0.1:6379");
-        redisUtils = new RedisUtils(config, "string");
+        config.useSingleServer().setAddress(redisConfig.getAddress());
+        redisUtils = new RedisUtils(config, redisConfig.getRedisBitKey());
         commandExecutor = redisUtils.getCommandExecutor();
 
     }
@@ -105,27 +106,32 @@ public class FilterTable {
     }
 
     public Boolean insert(long curIndex, long tag) {
-        if (writeBits(curIndex, tag, true)) return true;
-        return true;
+        return writeBits(curIndex, tag, true);
     }
 
     private boolean writeBits(long curIndex, long tag, boolean b) {
         CommandBatchService executorService = new CommandBatchService(commandExecutor);
         RBitSetAsync bs = redisUtils.createBitSet(executorService);
         // 判断curIndex出是否已有值
+        System.out.println("11aadf");
         for (int i = 0; i < BUCKET_SIZE; i++) {
+            System.out.println("22aadf");
             // 检查index出i位置是否已存在值0，若存在表示该处没有值
-            if (checkTag(curIndex, i, 0)) {
+            if (checkTag(curIndex, i, tag)) {
                 long[] bitIndexes = getPosOfTrue(curIndex, i, tag);
                 for (long bitIndex : bitIndexes) {
                     // 将位下标对应位设置1
                     if (bitIndex != -1) {
                         bs.setAsync(bitIndex, b);
+                        System.out.println("setAsync1");
                     }
                 }
+                System.out.println("444aadf：bitIndexes："+ JSON.toJSONString(bitIndexes));
+                System.out.println("444aadf");
                 return true;
             }
         }
+        System.out.println("33aadf");
         return false;
     }
 
@@ -142,6 +148,7 @@ public class FilterTable {
         for (int i = 0; i < BITS_PER_TAG; i++) {
             // 比如tag=15,bit表示0000 0000 0000 1111
             if (((tag & (1L << i)) == 0) == result.get(i)) {
+                // 有一个bit不相同，就表示不存在，返回false
                 return false;
             }
         }
@@ -193,18 +200,15 @@ public class FilterTable {
     public boolean contain(long curIndex, long altIndex, long tag) {
         // 判断curIndex出是否已有值
         for (int i = 0; i < BUCKET_SIZE; i++) {
-            // 检查index出i位置是否已存在值0，若存在表示该处没有值
+            // 检查index在桶的i位置是否已存在值0，若存在表示该处没有值
             if (checkTag(curIndex, i, tag) || checkTag(altIndex, i, tag)) {
                 return true;
             }
         }
-        return true;
+        return false;
     }
 
     public boolean delete(long curIndex, long tag) {
-        if (writeBits(curIndex, tag, false)) {
-            return true;
-        }
-        return false;
+        return writeBits(curIndex, tag, false);
     }
 }

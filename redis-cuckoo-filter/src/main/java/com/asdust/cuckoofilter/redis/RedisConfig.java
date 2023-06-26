@@ -9,11 +9,21 @@ public class RedisConfig {
 
     private String address;
 
+    private String redisBitKey;
+
     public String getAddress() {
         return address;
     }
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getRedisBitKey() {
+        return redisBitKey;
+    }
+
+    public void setRedisBitKey(String redisBitKey) {
+        this.redisBitKey = redisBitKey;
     }
 }
