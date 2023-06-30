@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class CuckooFilter<T> {
     private FilterTable table;
 
-    private static final int MAX_TRY_CUCKOO_COUNT = 500;
+    private static final int MAX_TRY_CUCKOO_COUNT = 100;
 
     private final AtomicLong numItems = new AtomicLong(0);
 
@@ -29,13 +29,13 @@ public class CuckooFilter<T> {
     public CuckooFilter(Long estimatedMaxNumKeys, RedisConfig redisConfig) {
         table = new FilterTable(estimatedMaxNumKeys, redisConfig);
     }
-
     /**
      * Calculates how many bits are needed to reach a given false positive rate.
      *
      * @param fpProb the false positive probability.
      * @return the length of the tag needed (in bits) to reach the false
      * positive rate.
+     * 用来计算最佳的指纹位数，本工具没有使用，使用了固定值16
      */
     public static int getBitsPerItemForFpRate(double fpProb, double loadFactor) {
         /*
@@ -87,7 +87,8 @@ public class CuckooFilter<T> {
             System.out.println("incrementAndGet");
             return true;
         }
-        //全部已满，则从槽1或槽2中随机剔除一个值的位置插入，然后将新的值插入到新的槽中，如此循环直到插入成功，或者达到最大值500
+        System.out.println("put:MAX_TRY_CUCKOO_COUNT");
+        //全部已满，则从槽1或槽2中随机剔除一个值的位置插入，然后将新的值插入到新的槽中，如此循环直到插入成功，或者达到最大值100
         for (int count = 1; count < MAX_TRY_CUCKOO_COUNT; count++) {
             // 随机获取一个槽的tag
             long index = randSelectSlot(curIndex, altIndex);
@@ -143,6 +144,7 @@ public class CuckooFilter<T> {
         // 存在则删除
         if (table.delete(curIndex, tag) || table.delete(altIndex, tag)) {
             numItems.decrementAndGet();
+            System.out.println("decrementAndGet");
             return true;
         }
         //todo 否则检查是否为victim，若是则设置victim为false

@@ -32,8 +32,11 @@ public class TestCuckooFilter {
 		RedisConfig redisConfig = new RedisConfig();
 		redisConfig.setAddress("redis://127.0.0.1:6379");
 		redisConfig.setRedisBitKey("cuckoo:key:test");
-		CuckooFilter<String>  cuckooFilter = new CuckooFilter<String> (2000000L, redisConfig);
+		// 最大估计存放100个值
+		CuckooFilter<String>  cuckooFilter = new CuckooFilter<>(100L, redisConfig);
 		cuckooFilter.put("aaaa");
+		System.out.println("------------------delete----------------------------------");
+//		cuckooFilter.delete("aaaa");
 		assertTrue(cuckooFilter.contain("aaaa"));
 		if(cuckooFilter.contain("aaaa")){
 			cuckooFilter.delete("aaaa");
